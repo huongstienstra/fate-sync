@@ -92,6 +92,7 @@ dependencies {
     // Coroutines
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
+    implementation(libs.coroutines.play.services)
 
     // ViewModel Compose
     implementation(libs.lifecycle.viewmodel.compose)
@@ -102,6 +103,9 @@ dependencies {
 
     // Material Icons Extended
     implementation(libs.material.icons.extended)
+
+    // ML Kit Face Detection
+    implementation(libs.mlkit.face.detection)
 
     // Testing
     testImplementation(libs.junit)

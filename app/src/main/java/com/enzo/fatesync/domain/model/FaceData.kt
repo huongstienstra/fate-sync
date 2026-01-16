@@ -5,8 +5,33 @@ import android.graphics.Bitmap
 data class FaceData(
     val bitmap: Bitmap,
     val boundingBox: FaceBoundingBox,
-    val landmarks: List<FaceLandmark>
-)
+    val landmarks: List<FaceLandmark>,
+    val smilingProbability: Float? = null,
+    val leftEyeOpenProbability: Float? = null,
+    val rightEyeOpenProbability: Float? = null,
+    val headEulerAngleX: Float = 0f,
+    val headEulerAngleY: Float = 0f,
+    val headEulerAngleZ: Float = 0f
+) {
+    val faceWidth: Int get() = boundingBox.right - boundingBox.left
+    val faceHeight: Int get() = boundingBox.bottom - boundingBox.top
+
+    fun getLandmark(type: LandmarkType): FaceLandmark? {
+        return landmarks.find { it.type == type }
+    }
+
+    val eyeDistance: Float?
+        get() {
+            val leftEye = getLandmark(LandmarkType.LEFT_EYE)
+            val rightEye = getLandmark(LandmarkType.RIGHT_EYE)
+            return if (leftEye != null && rightEye != null) {
+                kotlin.math.sqrt(
+                    (rightEye.x - leftEye.x) * (rightEye.x - leftEye.x) +
+                    (rightEye.y - leftEye.y) * (rightEye.y - leftEye.y)
+                )
+            } else null
+        }
+}
 
 data class FaceBoundingBox(
     val left: Int,

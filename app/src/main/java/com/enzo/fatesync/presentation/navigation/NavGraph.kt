@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.enzo.fatesync.presentation.screens.analysis.AnalysisScreen
 import com.enzo.fatesync.presentation.screens.camera.CameraScreen
 import com.enzo.fatesync.presentation.screens.home.HomeScreen
 
@@ -46,7 +47,17 @@ fun NavGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val photo1Uri = backStackEntry.arguments?.getString("photo1Uri") ?: return@composable
             val photo2Uri = backStackEntry.arguments?.getString("photo2Uri") ?: return@composable
-            // AnalysisScreen - to be implemented in Phase 4
+
+            AnalysisScreen(
+                photo1Uri = photo1Uri,
+                photo2Uri = photo2Uri,
+                onAnalysisComplete = { face1Data, face2Data ->
+                    navController.navigate(Screen.Result.createRoute("temp_result_id"))
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(
@@ -56,7 +67,7 @@ fun NavGraph(navController: NavHostController) {
             )
         ) { backStackEntry ->
             val resultId = backStackEntry.arguments?.getString("resultId") ?: return@composable
-            // ResultScreen - to be implemented
+            // ResultScreen - to be implemented in Phase 6
         }
     }
 }
