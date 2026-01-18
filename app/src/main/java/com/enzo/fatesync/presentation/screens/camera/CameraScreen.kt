@@ -48,10 +48,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import coil.compose.AsyncImage
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -61,14 +61,11 @@ import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun CameraScreen(
+    title: String,
     onNavigateBack: () -> Unit,
-    onPhotoCaptured: (Uri, Uri) -> Unit
+    onPhotoCaptured: (Uri) -> Unit
 ) {
     var hasCameraPermission by remember { mutableStateOf(false) }
-    var currentPhotoIndex by remember { mutableIntStateOf(0) }
-    var photo1Uri by remember { mutableStateOf<Uri?>(null) }
-    var photo2Uri by remember { mutableStateOf<Uri?>(null) }
-
     val context = LocalContext.current
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -80,40 +77,18 @@ fun CameraScreen(
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        uri?.let {
-            if (currentPhotoIndex == 0) {
-                photo1Uri = it
-                currentPhotoIndex = 1
-            } else {
-                photo2Uri = it
-            }
-        }
+        uri?.let { onPhotoCaptured(it) }
     }
 
     LaunchedEffect(Unit) {
         permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
-    // Check if both photos are captured
-    LaunchedEffect(photo1Uri, photo2Uri) {
-        if (photo1Uri != null && photo2Uri != null) {
-            onPhotoCaptured(photo1Uri!!, photo2Uri!!)
-        }
-    }
-
     if (hasCameraPermission) {
         CameraContent(
-            currentPhotoIndex = currentPhotoIndex,
-            photo1Uri = photo1Uri,
+            title = title,
             onNavigateBack = onNavigateBack,
-            onPhotoCaptured = { uri ->
-                if (currentPhotoIndex == 0) {
-                    photo1Uri = uri
-                    currentPhotoIndex = 1
-                } else {
-                    photo2Uri = uri
-                }
-            },
+            onPhotoCaptured = onPhotoCaptured,
             onGalleryClick = { galleryLauncher.launch("image/*") }
         )
     } else {
@@ -126,8 +101,7 @@ fun CameraScreen(
 
 @Composable
 private fun CameraContent(
-    currentPhotoIndex: Int,
-    photo1Uri: Uri?,
+    title: String,
     onNavigateBack: () -> Unit,
     onPhotoCaptured: (Uri) -> Unit,
     onGalleryClick: () -> Unit
@@ -135,7 +109,7 @@ private fun CameraContent(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
+    var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_FRONT) }
     var imageCapture by remember { mutableStateOf<ImageCapture?>(null) }
     val previewView = remember { PreviewView(context) }
 
@@ -191,27 +165,16 @@ private fun CameraContent(
             }
 
             Text(
-                text = if (currentPhotoIndex == 0) "Photo 1 of 2" else "Photo 2 of 2",
+                text = title,
                 style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
                 color = Color.White,
                 modifier = Modifier
                     .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            // Show first photo thumbnail if captured
-            if (photo1Uri != null && currentPhotoIndex == 1) {
-                AsyncImage(
-                    model = photo1Uri,
-                    contentDescription = "Photo 1",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                )
-            } else {
-                Spacer(modifier = Modifier.size(48.dp))
-            }
+            Spacer(modifier = Modifier.size(48.dp))
         }
 
         // Bottom Controls
