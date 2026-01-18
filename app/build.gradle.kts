@@ -107,6 +107,9 @@ dependencies {
     // ML Kit Face Detection
     implementation(libs.mlkit.face.detection)
 
+    // ExifInterface
+    implementation(libs.exifinterface)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

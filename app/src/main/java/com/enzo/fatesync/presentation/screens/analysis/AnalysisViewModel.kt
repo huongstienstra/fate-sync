@@ -3,8 +3,10 @@ package com.enzo.fatesync.presentation.screens.analysis
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.net.Uri
 import android.util.Log
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.enzo.fatesync.data.repository.FaceDetector
@@ -110,7 +112,7 @@ class AnalysisViewModel @Inject constructor(
         return try {
             Log.d(TAG, "Loading bitmap from URI: $uri, scheme: ${uri.scheme}")
 
-            when (uri.scheme) {
+            val bitmap = when (uri.scheme) {
                 "file" -> {
                     val file = File(uri.path ?: return null)
                     Log.d(TAG, "File exists: ${file.exists()}, path: ${file.absolutePath}")
@@ -130,9 +132,60 @@ class AnalysisViewModel @Inject constructor(
                     }
                 }
             }
+
+            if (bitmap != null) {
+                val rotation = getRotationFromUri(uri)
+                Log.d(TAG, "EXIF rotation for $uri: $rotation degrees")
+                if (rotation != 0) {
+                    rotateBitmap(bitmap, rotation)
+                } else {
+                    bitmap
+                }
+            } else {
+                null
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Error loading bitmap", e)
             null
         }
+    }
+
+    private fun getRotationFromUri(uri: Uri): Int {
+        return try {
+            val exif = when (uri.scheme) {
+                "file" -> {
+                    val path = uri.path ?: return 0
+                    ExifInterface(path)
+                }
+                "content" -> {
+                    context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                        ExifInterface(inputStream)
+                    } ?: return 0
+                }
+                else -> return 0
+            }
+
+            val orientation = exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            )
+            Log.d(TAG, "EXIF orientation value: $orientation")
+
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading EXIF", e)
+            0
+        }
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, degrees: Int): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degrees.toFloat())
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 }
