@@ -40,9 +40,7 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onSyncClick = {
                     if (yourPhotoUri != null && partnerPhotoUri != null) {
-                        val encodedUri1 = Uri.encode(yourPhotoUri.toString())
-                        val encodedUri2 = Uri.encode(partnerPhotoUri.toString())
-                        navController.navigate("sync/$encodedUri1/$encodedUri2")
+                        navController.navigate(Screen.Sync.route)
                     }
                 }
             )
@@ -73,45 +71,33 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable(
-            route = "sync/{yourUri}/{partnerUri}",
-            arguments = listOf(
-                navArgument("yourUri") { type = NavType.StringType },
-                navArgument("partnerUri") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val yourUri = backStackEntry.arguments?.getString("yourUri") ?: return@composable
-            val partnerUri = backStackEntry.arguments?.getString("partnerUri") ?: return@composable
+        composable(route = Screen.Sync.route) {
+            val yourUri = yourPhotoUri ?: return@composable
+            val partnerUri = partnerPhotoUri ?: return@composable
 
             SyncScreen(
-                yourPhotoUri = Uri.parse(Uri.decode(yourUri)),
-                partnerPhotoUri = Uri.parse(Uri.decode(partnerUri)),
+                yourPhotoUri = yourUri,
+                partnerPhotoUri = partnerUri,
                 onSyncComplete = { result ->
                     compatibilityResult = result
-                    navController.navigate("result/$yourUri/$partnerUri") {
+                    navController.navigate(Screen.Result.route) {
                         popUpTo(Screen.Home.route)
                     }
                 },
-                onError = { error ->
+                onError = {
                     navController.popBackStack(Screen.Home.route, inclusive = false)
                 }
             )
         }
 
-        composable(
-            route = "result/{yourUri}/{partnerUri}",
-            arguments = listOf(
-                navArgument("yourUri") { type = NavType.StringType },
-                navArgument("partnerUri") { type = NavType.StringType }
-            )
-        ) { backStackEntry ->
-            val yourUri = backStackEntry.arguments?.getString("yourUri") ?: return@composable
-            val partnerUri = backStackEntry.arguments?.getString("partnerUri") ?: return@composable
+        composable(route = Screen.Result.route) {
+            val yourUri = yourPhotoUri ?: return@composable
+            val partnerUri = partnerPhotoUri ?: return@composable
             val result = compatibilityResult ?: return@composable
 
             ResultScreen(
-                yourPhotoUri = Uri.parse(Uri.decode(yourUri)),
-                partnerPhotoUri = Uri.parse(Uri.decode(partnerUri)),
+                yourPhotoUri = yourUri,
+                partnerPhotoUri = partnerUri,
                 compatibilityResult = result,
                 onTryAgain = {
                     yourPhotoUri = null
