@@ -33,13 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.enzo.fatesync.domain.model.CompatibilityResult
 import com.enzo.fatesync.presentation.screens.analysis.AnalysisState
 import com.enzo.fatesync.presentation.screens.analysis.AnalysisViewModel
 import com.enzo.fatesync.ui.theme.Primary
@@ -49,7 +49,7 @@ import com.enzo.fatesync.ui.theme.Secondary
 fun SyncScreen(
     yourPhotoUri: Uri,
     partnerPhotoUri: Uri,
-    onSyncComplete: () -> Unit,
+    onSyncComplete: (CompatibilityResult) -> Unit,
     onError: (String) -> Unit,
     viewModel: AnalysisViewModel = hiltViewModel()
 ) {
@@ -82,9 +82,9 @@ fun SyncScreen(
     }
 
     LaunchedEffect(state) {
-        when (state) {
-            is AnalysisState.FacesDetected -> onSyncComplete()
-            is AnalysisState.Error -> onError((state as AnalysisState.Error).message)
+        when (val currentState = state) {
+            is AnalysisState.FacesDetected -> onSyncComplete(currentState.compatibilityResult)
+            is AnalysisState.Error -> onError(currentState.message)
             else -> {}
         }
     }

@@ -8,7 +8,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.enzo.fatesync.data.repository.FaceDetector
+import com.enzo.fatesync.domain.model.CompatibilityResult
 import com.enzo.fatesync.domain.model.FaceData
+import com.enzo.fatesync.domain.usecase.CompatibilityCalculator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +26,8 @@ sealed class AnalysisState {
     data object Loading : AnalysisState()
     data class FacesDetected(
         val face1: FaceData,
-        val face2: FaceData
+        val face2: FaceData,
+        val compatibilityResult: CompatibilityResult
     ) : AnalysisState()
     data class Error(val message: String) : AnalysisState()
 }
@@ -32,7 +35,8 @@ sealed class AnalysisState {
 @HiltViewModel
 class AnalysisViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val faceDetector: FaceDetector
+    private val faceDetector: FaceDetector,
+    private val compatibilityCalculator: CompatibilityCalculator
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AnalysisState>(AnalysisState.Loading)
@@ -81,9 +85,17 @@ class AnalysisViewModel @Inject constructor(
                         _state.value = AnalysisState.Error("No face detected in second photo. Make sure face is clearly visible.")
                     }
                     else -> {
+                        val face1 = faces1.first()
+                        val face2 = faces2.first()
+
+                        Log.d(TAG, "Calculating compatibility...")
+                        val compatibilityResult = compatibilityCalculator.calculate(face1, face2)
+                        Log.d(TAG, "Compatibility score: ${compatibilityResult.overallScore}")
+
                         _state.value = AnalysisState.FacesDetected(
-                            face1 = faces1.first(),
-                            face2 = faces2.first()
+                            face1 = face1,
+                            face2 = face2,
+                            compatibilityResult = compatibilityResult
                         )
                     }
                 }
