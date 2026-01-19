@@ -18,13 +18,13 @@ private const val TAG = "GeminiService"
 class GeminiService @Inject constructor() {
 
     private val model = GenerativeModel(
-        modelName = "gemini-1.5-flash",
+        modelName = "gemini-2.0-flash",
         apiKey = BuildConfig.GEMINI_API_KEY,
         generationConfig = generationConfig {
-            temperature = 0.8f
-            topK = 40
-            topP = 0.95f
-            maxOutputTokens = 1000
+            temperature = 0.7f
+            topK = 32
+            topP = 0.9f
+            maxOutputTokens = 800
         }
     )
 
@@ -33,14 +33,22 @@ class GeminiService @Inject constructor() {
             try {
                 val prompt = buildAnalysisPrompt(face1, face2)
                 Log.d(TAG, "Sending face data to Gemini for analysis...")
+                Log.d(TAG, "API Key present: ${BuildConfig.GEMINI_API_KEY.isNotEmpty()}")
 
                 val response = model.generateContent(prompt)
-                val text = response.text ?: return@withContext getFallbackResult()
+                val text = response.text
 
-                Log.d(TAG, "Gemini response: $text")
+                if (text.isNullOrBlank()) {
+                    Log.e(TAG, "Gemini returned empty response")
+                    return@withContext getFallbackResult()
+                }
+
+                Log.d(TAG, "Gemini response received (${text.length} chars)")
+                Log.d(TAG, "Response preview: ${text.take(200)}")
                 parseCompatibilityResult(text)
             } catch (e: Exception) {
-                Log.e(TAG, "Error analyzing compatibility", e)
+                Log.e(TAG, "Error analyzing compatibility: ${e.message}", e)
+                Log.e(TAG, "Exception type: ${e.javaClass.simpleName}")
                 getFallbackResult()
             }
         }
@@ -51,37 +59,14 @@ class GeminiService @Inject constructor() {
         val face2Data = formatFaceData("Person 2", face2)
 
         return """
-            You are FateSync, a fun and mystical compatibility analyzer for an entertainment app.
-            Analyze the facial features of two people and generate a creative compatibility reading.
+You are a fun compatibility game assistant. Based on facial expression data, create an entertaining compatibility score.
 
-            FACIAL DATA:
+$face1Data
 
-            $face1Data
+$face2Data
 
-            $face2Data
-
-            Based on this facial data, generate a compatibility analysis. Be creative and fun!
-            Consider things like:
-            - Similar smile patterns suggest shared joy
-            - Eye openness can indicate alertness and engagement
-            - Head angles might show complementary personalities
-            - Facial symmetry relates to harmony
-
-            IMPORTANT: You MUST respond with ONLY a valid JSON object in this exact format (no markdown, no extra text):
-            {
-                "overallScore": <number 65-98>,
-                "categoryScores": {
-                    "Emotional Chemistry": <number 60-100>,
-                    "Communication Style": <number 60-100>,
-                    "Shared Energy": <number 60-100>,
-                    "Long-term Harmony": <number 60-100>,
-                    "Fun Factor": <number 60-100>
-                },
-                "message": "<short 3-5 word title like 'A Beautiful Connection!' or 'Sparks Will Fly!'>",
-                "insight": "<2-3 paragraphs of mystical, fun compatibility reading. Be positive and entertaining. Use romantic and playful language.>"
-            }
-
-            Remember: This is for entertainment only. Be positive, fun, and creative!
+Respond with ONLY valid JSON (no markdown):
+{"overallScore":<65-98>,"categoryScores":{"Chemistry":<60-100>,"Communication":<60-100>,"Energy":<60-100>,"Harmony":<60-100>,"Fun":<60-100>},"message":"<3-5 word fun title>","insight":"<2 short fun paragraphs about their compatibility>"}
         """.trimIndent()
     }
 
@@ -137,11 +122,11 @@ class GeminiService @Inject constructor() {
         return CompatibilityResult(
             overallScore = score,
             categoryScores = mapOf(
-                "Emotional Chemistry" to (70..95).random().toFloat(),
-                "Communication Style" to (70..95).random().toFloat(),
-                "Shared Energy" to (70..95).random().toFloat(),
-                "Long-term Harmony" to (70..95).random().toFloat(),
-                "Fun Factor" to (70..95).random().toFloat()
+                "Chemistry" to (70..95).random().toFloat(),
+                "Communication" to (70..95).random().toFloat(),
+                "Energy" to (70..95).random().toFloat(),
+                "Harmony" to (70..95).random().toFloat(),
+                "Fun" to (70..95).random().toFloat()
             ),
             message = when {
                 score >= 85 -> "A Beautiful Match!"
@@ -149,7 +134,7 @@ class GeminiService @Inject constructor() {
                 else -> "Interesting Connection!"
             },
             details = emptyList(),
-            aiInsight = "The stars have aligned to bring you two together! Your energies complement each other in wonderful ways, creating a natural harmony that's both exciting and comforting. There's a spark between you that promises many shared laughs and meaningful moments.\n\nYour connection shows the beautiful balance of similarities and differences that make relationships thrive. Where one leads, the other supports, creating a dance of mutual understanding and growth.\n\nEmbrace this cosmic connection and see where the journey takes you!"
+            aiInsight = "The stars have aligned to bring you two together! Your energies complement each other in wonderful ways, creating a natural harmony that's both exciting and comforting. There's a spark between you that promises many shared laughs and meaningful moments.\n\nYour connection shows the beautiful balance of similarities and differences that make relationships thrive. Embrace this cosmic connection and see where the journey takes you!"
         )
     }
 }
