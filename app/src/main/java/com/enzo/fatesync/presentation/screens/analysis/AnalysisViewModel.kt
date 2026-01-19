@@ -13,7 +13,6 @@ import com.enzo.fatesync.data.remote.GeminiService
 import com.enzo.fatesync.data.repository.FaceDetector
 import com.enzo.fatesync.domain.model.CompatibilityResult
 import com.enzo.fatesync.domain.model.FaceData
-import com.enzo.fatesync.domain.usecase.CompatibilityCalculator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +38,6 @@ sealed class AnalysisState {
 class AnalysisViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val faceDetector: FaceDetector,
-    private val compatibilityCalculator: CompatibilityCalculator,
     private val geminiService: GeminiService
 ) : ViewModel() {
 
@@ -92,19 +90,14 @@ class AnalysisViewModel @Inject constructor(
                         val face1 = faces1.first()
                         val face2 = faces2.first()
 
-                        Log.d(TAG, "Calculating compatibility...")
-                        val compatibilityResult = compatibilityCalculator.calculate(face1, face2)
-                        Log.d(TAG, "Compatibility score: ${compatibilityResult.overallScore}")
-
-                        Log.d(TAG, "Generating AI insight...")
-                        val aiInsight = geminiService.generateCompatibilityInsight(compatibilityResult)
-                        val resultWithInsight = compatibilityResult.copy(aiInsight = aiInsight)
-                        Log.d(TAG, "AI insight generated")
+                        Log.d(TAG, "Sending face data to Gemini for analysis...")
+                        val compatibilityResult = geminiService.analyzeCompatibility(face1, face2)
+                        Log.d(TAG, "Gemini analysis complete - Score: ${compatibilityResult.overallScore}")
 
                         _state.value = AnalysisState.FacesDetected(
                             face1 = face1,
                             face2 = face2,
-                            compatibilityResult = resultWithInsight
+                            compatibilityResult = compatibilityResult
                         )
                     }
                 }

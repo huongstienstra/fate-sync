@@ -3,10 +3,12 @@ package com.enzo.fatesync.data.remote
 import android.util.Log
 import com.enzo.fatesync.BuildConfig
 import com.enzo.fatesync.domain.model.CompatibilityResult
+import com.enzo.fatesync.domain.model.FaceData
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,65 +21,135 @@ class GeminiService @Inject constructor() {
         modelName = "gemini-1.5-flash",
         apiKey = BuildConfig.GEMINI_API_KEY,
         generationConfig = generationConfig {
-            temperature = 0.9f
+            temperature = 0.8f
             topK = 40
             topP = 0.95f
-            maxOutputTokens = 500
+            maxOutputTokens = 1000
         }
     )
 
-    suspend fun generateCompatibilityInsight(result: CompatibilityResult): String {
+    suspend fun analyzeCompatibility(face1: FaceData, face2: FaceData): CompatibilityResult {
         return withContext(Dispatchers.IO) {
             try {
-                val prompt = buildPrompt(result)
-                Log.d(TAG, "Sending prompt to Gemini...")
+                val prompt = buildAnalysisPrompt(face1, face2)
+                Log.d(TAG, "Sending face data to Gemini for analysis...")
 
                 val response = model.generateContent(prompt)
-                val text = response.text ?: getFallbackInsight(result)
+                val text = response.text ?: return@withContext getFallbackResult()
 
-                Log.d(TAG, "Gemini response received: ${text.take(100)}...")
-                text
+                Log.d(TAG, "Gemini response: $text")
+                parseCompatibilityResult(text)
             } catch (e: Exception) {
-                Log.e(TAG, "Error generating insight", e)
-                getFallbackInsight(result)
+                Log.e(TAG, "Error analyzing compatibility", e)
+                getFallbackResult()
             }
         }
     }
 
-    private fun buildPrompt(result: CompatibilityResult): String {
-        val categoryBreakdown = result.categoryScores.entries.joinToString("\n") { (category, score) ->
-            "- $category: ${score.toInt()}%"
-        }
+    private fun buildAnalysisPrompt(face1: FaceData, face2: FaceData): String {
+        val face1Data = formatFaceData("Person 1", face1)
+        val face2Data = formatFaceData("Person 2", face2)
 
         return """
-            You are a fun, playful relationship compatibility advisor for an entertainment app called FateSync.
-            Based on facial analysis, generate a short, engaging compatibility reading.
+            You are FateSync, a fun and mystical compatibility analyzer for an entertainment app.
+            Analyze the facial features of two people and generate a creative compatibility reading.
 
-            Compatibility Score: ${result.overallScore}%
+            FACIAL DATA:
 
-            Category Breakdown:
-            $categoryBreakdown
+            $face1Data
 
-            Guidelines:
-            - Be positive, fun, and lighthearted
-            - Keep it to 2-3 short paragraphs
-            - Use romantic and mystical language
-            - Include specific observations based on the scores
-            - End with an encouraging message
-            - Don't mention this is AI-generated or based on facial analysis
-            - Write as if you're a fortune teller or relationship guru
+            $face2Data
 
-            Generate the compatibility reading:
+            Based on this facial data, generate a compatibility analysis. Be creative and fun!
+            Consider things like:
+            - Similar smile patterns suggest shared joy
+            - Eye openness can indicate alertness and engagement
+            - Head angles might show complementary personalities
+            - Facial symmetry relates to harmony
+
+            IMPORTANT: You MUST respond with ONLY a valid JSON object in this exact format (no markdown, no extra text):
+            {
+                "overallScore": <number 65-98>,
+                "categoryScores": {
+                    "Emotional Chemistry": <number 60-100>,
+                    "Communication Style": <number 60-100>,
+                    "Shared Energy": <number 60-100>,
+                    "Long-term Harmony": <number 60-100>,
+                    "Fun Factor": <number 60-100>
+                },
+                "message": "<short 3-5 word title like 'A Beautiful Connection!' or 'Sparks Will Fly!'>",
+                "insight": "<2-3 paragraphs of mystical, fun compatibility reading. Be positive and entertaining. Use romantic and playful language.>"
+            }
+
+            Remember: This is for entertainment only. Be positive, fun, and creative!
         """.trimIndent()
     }
 
-    private fun getFallbackInsight(result: CompatibilityResult): String {
-        return when {
-            result.overallScore >= 90 -> "The stars have aligned perfectly for you two! Your connection radiates with an extraordinary harmony that's rare to find. This is a bond that transcends the ordinary - cherish it and nurture it, for you've found something truly special."
-            result.overallScore >= 80 -> "What a beautiful match! Your energies complement each other wonderfully, creating a natural flow of understanding and affection. There's a magnetic quality to your connection that promises deep conversations and shared adventures."
-            result.overallScore >= 70 -> "There's genuine warmth between you two! Your compatibility shows a solid foundation with plenty of room for growth. The subtle differences in your energies actually create an intriguing balance - opposites attracting in the best way."
-            result.overallScore >= 60 -> "An interesting pairing with hidden potential! While you may need to work a bit harder to sync your rhythms, the effort will be rewarding. The universe often pairs people who have much to teach each other."
-            else -> "Every connection has its own unique magic! While the cosmic alignment suggests some challenges, remember that the most meaningful relationships often require patience and understanding. Your journey together could be one of beautiful growth."
+    private fun formatFaceData(label: String, face: FaceData): String {
+        val smileProb = face.smilingProbability?.let { "%.1f%%".format(it * 100) } ?: "unknown"
+        val leftEyeOpen = face.leftEyeOpenProbability?.let { "%.1f%%".format(it * 100) } ?: "unknown"
+        val rightEyeOpen = face.rightEyeOpenProbability?.let { "%.1f%%".format(it * 100) } ?: "unknown"
+
+        return """
+            $label:
+            - Smile probability: $smileProb
+            - Left eye open: $leftEyeOpen
+            - Right eye open: $rightEyeOpen
+            - Head tilt (X): ${face.headEulerAngleX?.let { "%.1f°".format(it) } ?: "unknown"}
+            - Head turn (Y): ${face.headEulerAngleY?.let { "%.1f°".format(it) } ?: "unknown"}
+            - Head rotation (Z): ${face.headEulerAngleZ?.let { "%.1f°".format(it) } ?: "unknown"}
+            - Face bounds: ${face.boundingBox.let { "${it.right - it.left}x${it.bottom - it.top}" }}
+            - Landmarks detected: ${face.landmarks.size}
+        """.trimIndent()
+    }
+
+    private fun parseCompatibilityResult(response: String): CompatibilityResult {
+        return try {
+            // Clean up response - remove markdown code blocks if present
+            val cleanJson = response
+                .replace("```json", "")
+                .replace("```", "")
+                .trim()
+
+            val json = JSONObject(cleanJson)
+
+            val categoryScoresJson = json.getJSONObject("categoryScores")
+            val categoryScores = mutableMapOf<String, Float>()
+            categoryScoresJson.keys().forEach { key ->
+                categoryScores[key] = categoryScoresJson.getDouble(key).toFloat()
+            }
+
+            CompatibilityResult(
+                overallScore = json.getInt("overallScore"),
+                categoryScores = categoryScores,
+                message = json.getString("message"),
+                details = emptyList(),
+                aiInsight = json.getString("insight")
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parsing Gemini response", e)
+            getFallbackResult()
         }
+    }
+
+    private fun getFallbackResult(): CompatibilityResult {
+        val score = (75..92).random()
+        return CompatibilityResult(
+            overallScore = score,
+            categoryScores = mapOf(
+                "Emotional Chemistry" to (70..95).random().toFloat(),
+                "Communication Style" to (70..95).random().toFloat(),
+                "Shared Energy" to (70..95).random().toFloat(),
+                "Long-term Harmony" to (70..95).random().toFloat(),
+                "Fun Factor" to (70..95).random().toFloat()
+            ),
+            message = when {
+                score >= 85 -> "A Beautiful Match!"
+                score >= 75 -> "Great Potential!"
+                else -> "Interesting Connection!"
+            },
+            details = emptyList(),
+            aiInsight = "The stars have aligned to bring you two together! Your energies complement each other in wonderful ways, creating a natural harmony that's both exciting and comforting. There's a spark between you that promises many shared laughs and meaningful moments.\n\nYour connection shows the beautiful balance of similarities and differences that make relationships thrive. Where one leads, the other supports, creating a dance of mutual understanding and growth.\n\nEmbrace this cosmic connection and see where the journey takes you!"
+        )
     }
 }
