@@ -2,6 +2,7 @@ package com.enzo.fatesync.presentation.navigation
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,14 +20,18 @@ import com.enzo.fatesync.presentation.screens.result.ResultScreen
 import com.enzo.fatesync.presentation.screens.sync.SyncScreen
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     var yourPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var partnerPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var compatibilityResult by remember { mutableStateOf<CompatibilityResult?>(null) }
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = Screen.Home.route,
+        modifier = modifier
     ) {
         composable(route = Screen.Home.route) {
             HomeScreen(
