@@ -289,16 +289,6 @@ fun ResultScreen(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        // Disclaimer
-        Text(
-            text = "This is for entertainment purposes only",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

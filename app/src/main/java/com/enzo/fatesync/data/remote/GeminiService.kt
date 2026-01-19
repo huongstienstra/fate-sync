@@ -18,14 +18,8 @@ private const val TAG = "GeminiService"
 class GeminiService @Inject constructor() {
 
     private val model = GenerativeModel(
-        modelName = "gemini-2.0-flash",
-        apiKey = BuildConfig.GEMINI_API_KEY,
-        generationConfig = generationConfig {
-            temperature = 0.7f
-            topK = 32
-            topP = 0.9f
-            maxOutputTokens = 800
-        }
+        modelName = "gemini-1.5-flash",
+        apiKey = BuildConfig.GEMINI_API_KEY
     )
 
     suspend fun analyzeCompatibility(face1: FaceData, face2: FaceData): CompatibilityResult {
@@ -55,18 +49,18 @@ class GeminiService @Inject constructor() {
     }
 
     private fun buildAnalysisPrompt(face1: FaceData, face2: FaceData): String {
-        val face1Data = formatFaceData("Person 1", face1)
-        val face2Data = formatFaceData("Person 2", face2)
+        val smile1 = face1.smilingProbability?.let { (it * 100).toInt() } ?: 50
+        val smile2 = face2.smilingProbability?.let { (it * 100).toInt() } ?: 50
+        val eyeOpen1 = face1.leftEyeOpenProbability?.let { (it * 100).toInt() } ?: 80
+        val eyeOpen2 = face2.leftEyeOpenProbability?.let { (it * 100).toInt() } ?: 80
 
         return """
-You are a fun compatibility game assistant. Based on facial expression data, create an entertaining compatibility score.
+Generate a fun game score based on these numbers:
+Player1: smile=$smile1, eyes=$eyeOpen1
+Player2: smile=$smile2, eyes=$eyeOpen2
 
-$face1Data
-
-$face2Data
-
-Respond with ONLY valid JSON (no markdown):
-{"overallScore":<65-98>,"categoryScores":{"Chemistry":<60-100>,"Communication":<60-100>,"Energy":<60-100>,"Harmony":<60-100>,"Fun":<60-100>},"message":"<3-5 word fun title>","insight":"<2 short fun paragraphs about their compatibility>"}
+Return JSON only:
+{"overallScore":85,"categoryScores":{"Chemistry":82,"Communication":78,"Energy":90,"Harmony":85,"Fun":88},"message":"Great Match!","insight":"Two paragraphs of fun positive text about teamwork and friendship."}
         """.trimIndent()
     }
 
