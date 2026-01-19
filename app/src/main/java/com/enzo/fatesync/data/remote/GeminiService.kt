@@ -5,7 +5,6 @@ import com.enzo.fatesync.BuildConfig
 import com.enzo.fatesync.domain.model.CompatibilityResult
 import com.enzo.fatesync.domain.model.FaceData
 import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -17,8 +16,8 @@ private const val TAG = "GeminiService"
 @Singleton
 class GeminiService @Inject constructor() {
 
-    private val model = GenerativeModel(
-        modelName = "gemini-1.5-flash-latest",
+    private val generativeModel = GenerativeModel(
+        modelName = "gemini-1.5-flash",
         apiKey = BuildConfig.GEMINI_API_KEY
     )
 
@@ -29,7 +28,7 @@ class GeminiService @Inject constructor() {
                 Log.d(TAG, "Sending face data to Gemini for analysis...")
                 Log.d(TAG, "API Key present: ${BuildConfig.GEMINI_API_KEY.isNotEmpty()}")
 
-                val response = model.generateContent(prompt)
+                val response = generativeModel.generateContent(prompt)
                 val text = response.text
 
                 if (text.isNullOrBlank()) {
