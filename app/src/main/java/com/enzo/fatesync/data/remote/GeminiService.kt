@@ -41,8 +41,10 @@ class GeminiService @Inject constructor() {
                 Log.d(TAG, "Response preview: ${text.take(200)}")
                 parseCompatibilityResult(text)
             } catch (e: Exception) {
-                Log.e(TAG, "Error analyzing compatibility: ${e.message}", e)
-                Log.e(TAG, "Exception type: ${e.javaClass.simpleName}")
+                Log.e(TAG, "Error analyzing compatibility: ${e.message}")
+                Log.e(TAG, "Exception type: ${e.javaClass.name}")
+                Log.e(TAG, "Cause: ${e.cause?.message}")
+                Log.e(TAG, "Stack trace:", e)
                 getFallbackResult()
             }
         }
