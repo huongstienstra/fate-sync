@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.enzo.fatesync.data.remote.GeminiService
 import com.enzo.fatesync.data.repository.FaceDetector
 import com.enzo.fatesync.domain.model.CompatibilityResult
 import com.enzo.fatesync.domain.model.FaceData
@@ -38,7 +39,8 @@ sealed class AnalysisState {
 class AnalysisViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val faceDetector: FaceDetector,
-    private val compatibilityCalculator: CompatibilityCalculator
+    private val compatibilityCalculator: CompatibilityCalculator,
+    private val geminiService: GeminiService
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AnalysisState>(AnalysisState.Loading)
@@ -94,10 +96,15 @@ class AnalysisViewModel @Inject constructor(
                         val compatibilityResult = compatibilityCalculator.calculate(face1, face2)
                         Log.d(TAG, "Compatibility score: ${compatibilityResult.overallScore}")
 
+                        Log.d(TAG, "Generating AI insight...")
+                        val aiInsight = geminiService.generateCompatibilityInsight(compatibilityResult)
+                        val resultWithInsight = compatibilityResult.copy(aiInsight = aiInsight)
+                        Log.d(TAG, "AI insight generated")
+
                         _state.value = AnalysisState.FacesDetected(
                             face1 = face1,
                             face2 = face2,
-                            compatibilityResult = compatibilityResult
+                            compatibilityResult = resultWithInsight
                         )
                     }
                 }
