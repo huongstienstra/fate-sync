@@ -18,7 +18,7 @@ private const val TAG = "GeminiService"
 class GeminiService @Inject constructor() {
 
     private val model = GenerativeModel(
-        modelName = "gemini-1.5-flash",
+        modelName = "gemini-1.5-flash-latest",
         apiKey = BuildConfig.GEMINI_API_KEY
     )
 
