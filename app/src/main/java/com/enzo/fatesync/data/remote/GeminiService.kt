@@ -21,11 +21,15 @@ class GeminiService @Inject constructor() {
         apiKey = BuildConfig.GEMINI_API_KEY
     )
 
-    suspend fun analyzeCompatibility(face1: FaceData, face2: FaceData): CompatibilityResult {
+    suspend fun analyzeCompatibility(
+        face1: FaceData,
+        face2: FaceData,
+        languageCode: String = "en"
+    ): CompatibilityResult {
         return withContext(Dispatchers.IO) {
             try {
-                val prompt = buildAnalysisPrompt(face1, face2)
-                Log.d(TAG, "Sending face data to Gemini for analysis...")
+                val prompt = buildAnalysisPrompt(face1, face2, languageCode)
+                Log.d(TAG, "Sending face data to Gemini for analysis (language: $languageCode)...")
                 Log.d(TAG, "API Key present: ${BuildConfig.GEMINI_API_KEY.isNotEmpty()}")
 
                 val response = generativeModel.generateContent(prompt)
@@ -33,36 +37,47 @@ class GeminiService @Inject constructor() {
 
                 if (text.isNullOrBlank()) {
                     Log.e(TAG, "Gemini returned empty response")
-                    return@withContext getFallbackResult()
+                    return@withContext getFallbackResult(languageCode)
                 }
 
                 Log.d(TAG, "Gemini response received (${text.length} chars)")
                 Log.d(TAG, "Response preview: ${text.take(200)}")
-                parseCompatibilityResult(text)
+                parseCompatibilityResult(text, languageCode)
             } catch (e: Exception) {
                 Log.e(TAG, "Error analyzing compatibility: ${e.message}")
                 Log.e(TAG, "Exception type: ${e.javaClass.name}")
                 Log.e(TAG, "Cause: ${e.cause?.message}")
                 Log.e(TAG, "Stack trace:", e)
-                getFallbackResult()
+                getFallbackResult(languageCode)
             }
         }
     }
 
-    private fun buildAnalysisPrompt(face1: FaceData, face2: FaceData): String {
+    private fun buildAnalysisPrompt(face1: FaceData, face2: FaceData, languageCode: String): String {
         val smile1 = face1.smilingProbability?.let { (it * 100).toInt() } ?: 50
         val smile2 = face2.smilingProbability?.let { (it * 100).toInt() } ?: 50
         val eyeOpen1 = face1.leftEyeOpenProbability?.let { (it * 100).toInt() } ?: 80
         val eyeOpen2 = face2.leftEyeOpenProbability?.let { (it * 100).toInt() } ?: 80
 
-        return """
+        return if (languageCode == "vi") {
+            """
+Tạo điểm số trò chơi vui dựa trên các con số này:
+Người1: cười=$smile1, mắt=$eyeOpen1
+Người2: cười=$smile2, mắt=$eyeOpen2
+
+Chỉ trả về JSON (tất cả nội dung phải bằng tiếng Việt):
+{"overallScore":85,"categoryScores":{"Hóa học":82,"Giao tiếp":78,"Năng lượng":90,"Hòa hợp":85,"Vui vẻ":88},"message":"Cặp đôi tuyệt vời!","insight":"Hai đoạn văn vui và tích cực bằng tiếng Việt về sự hợp tác và tình bạn."}
+            """.trimIndent()
+        } else {
+            """
 Generate a fun game score based on these numbers:
 Player1: smile=$smile1, eyes=$eyeOpen1
 Player2: smile=$smile2, eyes=$eyeOpen2
 
 Return JSON only:
 {"overallScore":85,"categoryScores":{"Chemistry":82,"Communication":78,"Energy":90,"Harmony":85,"Fun":88},"message":"Great Match!","insight":"Two paragraphs of fun positive text about teamwork and friendship."}
-        """.trimIndent()
+            """.trimIndent()
+        }
     }
 
     private fun formatFaceData(label: String, face: FaceData): String {
@@ -83,7 +98,7 @@ Return JSON only:
         """.trimIndent()
     }
 
-    private fun parseCompatibilityResult(response: String): CompatibilityResult {
+    private fun parseCompatibilityResult(response: String, languageCode: String): CompatibilityResult {
         return try {
             // Clean up response - remove markdown code blocks if present
             val cleanJson = response
@@ -108,28 +123,49 @@ Return JSON only:
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing Gemini response", e)
-            getFallbackResult()
+            getFallbackResult(languageCode)
         }
     }
 
-    private fun getFallbackResult(): CompatibilityResult {
+    private fun getFallbackResult(languageCode: String = "en"): CompatibilityResult {
         val score = (75..92).random()
-        return CompatibilityResult(
-            overallScore = score,
-            categoryScores = mapOf(
-                "Chemistry" to (70..95).random().toFloat(),
-                "Communication" to (70..95).random().toFloat(),
-                "Energy" to (70..95).random().toFloat(),
-                "Harmony" to (70..95).random().toFloat(),
-                "Fun" to (70..95).random().toFloat()
-            ),
-            message = when {
-                score >= 85 -> "A Beautiful Match!"
-                score >= 75 -> "Great Potential!"
-                else -> "Interesting Connection!"
-            },
-            details = emptyList(),
-            aiInsight = "The stars have aligned to bring you two together! Your energies complement each other in wonderful ways, creating a natural harmony that's both exciting and comforting. There's a spark between you that promises many shared laughs and meaningful moments.\n\nYour connection shows the beautiful balance of similarities and differences that make relationships thrive. Embrace this cosmic connection and see where the journey takes you!"
-        )
+
+        return if (languageCode == "vi") {
+            CompatibilityResult(
+                overallScore = score,
+                categoryScores = mapOf(
+                    "Hóa học" to (70..95).random().toFloat(),
+                    "Giao tiếp" to (70..95).random().toFloat(),
+                    "Năng lượng" to (70..95).random().toFloat(),
+                    "Hòa hợp" to (70..95).random().toFloat(),
+                    "Vui vẻ" to (70..95).random().toFloat()
+                ),
+                message = when {
+                    score >= 85 -> "Cặp đôi hoàn hảo!"
+                    score >= 75 -> "Tiềm năng tuyệt vời!"
+                    else -> "Kết nối thú vị!"
+                },
+                details = emptyList(),
+                aiInsight = "Các vì sao đã sắp đặt để đưa hai bạn đến với nhau! Năng lượng của các bạn bổ sung cho nhau một cách tuyệt vời, tạo nên sự hòa hợp tự nhiên vừa thú vị vừa ấm áp. Có một tia sáng giữa hai bạn hứa hẹn nhiều tiếng cười và khoảnh khắc ý nghĩa.\n\nMối liên kết của các bạn cho thấy sự cân bằng tuyệt đẹp giữa những điểm tương đồng và khác biệt - điều làm cho mọi mối quan hệ thăng hoa. Hãy đón nhận kết nối định mệnh này và xem cuộc hành trình sẽ đưa các bạn đến đâu!"
+            )
+        } else {
+            CompatibilityResult(
+                overallScore = score,
+                categoryScores = mapOf(
+                    "Chemistry" to (70..95).random().toFloat(),
+                    "Communication" to (70..95).random().toFloat(),
+                    "Energy" to (70..95).random().toFloat(),
+                    "Harmony" to (70..95).random().toFloat(),
+                    "Fun" to (70..95).random().toFloat()
+                ),
+                message = when {
+                    score >= 85 -> "A Beautiful Match!"
+                    score >= 75 -> "Great Potential!"
+                    else -> "Interesting Connection!"
+                },
+                details = emptyList(),
+                aiInsight = "The stars have aligned to bring you two together! Your energies complement each other in wonderful ways, creating a natural harmony that's both exciting and comforting. There's a spark between you that promises many shared laughs and meaningful moments.\n\nYour connection shows the beautiful balance of similarities and differences that make relationships thrive. Embrace this cosmic connection and see where the journey takes you!"
+            )
+        }
     }
 }

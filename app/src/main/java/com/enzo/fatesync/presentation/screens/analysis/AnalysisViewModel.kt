@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.enzo.fatesync.data.local.LanguageManager
 import com.enzo.fatesync.data.remote.GeminiService
 import com.enzo.fatesync.data.repository.FaceDetector
 import com.enzo.fatesync.domain.model.CompatibilityResult
@@ -18,6 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -38,7 +40,8 @@ sealed class AnalysisState {
 class AnalysisViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val faceDetector: FaceDetector,
-    private val geminiService: GeminiService
+    private val geminiService: GeminiService,
+    private val languageManager: LanguageManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AnalysisState>(AnalysisState.Loading)
@@ -90,8 +93,10 @@ class AnalysisViewModel @Inject constructor(
                         val face1 = faces1.first()
                         val face2 = faces2.first()
 
-                        Log.d(TAG, "Sending face data to Gemini for analysis...")
-                        val compatibilityResult = geminiService.analyzeCompatibility(face1, face2)
+                        // Get current language for Gemini prompt
+                        val currentLanguage = languageManager.currentLanguage.first()
+                        Log.d(TAG, "Sending face data to Gemini for analysis (language: ${currentLanguage.code})...")
+                        val compatibilityResult = geminiService.analyzeCompatibility(face1, face2, currentLanguage.code)
                         Log.d(TAG, "Gemini analysis complete - Score: ${compatibilityResult.overallScore}")
 
                         _state.value = AnalysisState.FacesDetected(
