@@ -16,26 +16,42 @@ private val DarkColorScheme = darkColorScheme(
     primary = PrimaryLight,
     onPrimary = Color.Black,
     primaryContainer = PrimaryDark,
+    onPrimaryContainer = Color.White,
     secondary = SecondaryLight,
     onSecondary = Color.Black,
+    secondaryContainer = SecondaryDark,
+    onSecondaryContainer = Color.White,
     tertiary = TertiaryLight,
+    onTertiary = Color.Black,
     background = BackgroundDark,
     onBackground = Color.White,
     surface = SurfaceDark,
-    onSurface = Color.White
+    onSurface = Color.White,
+    surfaceVariant = SurfaceDark,
+    onSurfaceVariant = Color(0xFFE8D5E8),
+    outline = Color(0xFF9B8A9B),
+    outlineVariant = Color(0xFF5C4D5C)
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Primary,
     onPrimary = Color.White,
     primaryContainer = PrimaryLight,
+    onPrimaryContainer = PrimaryDark,
     secondary = Secondary,
     onSecondary = Color.White,
+    secondaryContainer = SecondaryLight,
+    onSecondaryContainer = SecondaryDark,
     tertiary = Tertiary,
+    onTertiary = Color.White,
     background = BackgroundLight,
-    onBackground = Color(0xFF1C1B1F),
-    surface = BackgroundLight,
-    onSurface = Color(0xFF1C1B1F)
+    onBackground = TextPrimary,
+    surface = SurfaceLight,
+    onSurface = TextPrimary,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = TextSecondary,
+    outline = Color(0xFFCDB4C8),
+    outlineVariant = Color(0xFFE8D5E8)
 )
 
 @Composable
@@ -49,7 +65,7 @@ fun FateSyncTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = if (darkTheme) BackgroundDark.toArgb() else BackgroundLight.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }

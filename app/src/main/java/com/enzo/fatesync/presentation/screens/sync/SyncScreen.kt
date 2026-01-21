@@ -34,16 +34,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.enzo.fatesync.R
 import com.enzo.fatesync.domain.model.CompatibilityResult
 import com.enzo.fatesync.presentation.screens.analysis.AnalysisState
 import com.enzo.fatesync.presentation.screens.analysis.AnalysisViewModel
+import com.enzo.fatesync.ui.theme.HeartPink
 import com.enzo.fatesync.ui.theme.Primary
+import com.enzo.fatesync.ui.theme.PrimaryLight
 import com.enzo.fatesync.ui.theme.Secondary
+import com.enzo.fatesync.ui.theme.Tertiary
 
 @Composable
 fun SyncScreen(
@@ -95,9 +100,9 @@ fun SyncScreen(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Primary.copy(alpha = 0.1f + gradientOffset * 0.2f),
-                        Secondary.copy(alpha = 0.1f + (1 - gradientOffset) * 0.2f),
-                        Primary.copy(alpha = 0.1f + gradientOffset * 0.2f)
+                        PrimaryLight.copy(alpha = 0.2f + gradientOffset * 0.2f),
+                        Tertiary.copy(alpha = 0.2f + (1 - gradientOffset) * 0.2f),
+                        PrimaryLight.copy(alpha = 0.2f + gradientOffset * 0.2f)
                     )
                 )
             ),
@@ -119,14 +124,14 @@ fun SyncScreen(
                         .clip(CircleShape)
                         .background(
                             brush = Brush.linearGradient(
-                                colors = listOf(Primary, Primary.copy(alpha = 0.7f))
+                                colors = listOf(Primary, Tertiary)
                             )
                         )
                         .padding(3.dp)
                 ) {
                     AsyncImage(
                         model = yourPhotoUri,
-                        contentDescription = "You",
+                        contentDescription = stringResource(R.string.sync_you),
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape),
@@ -143,7 +148,7 @@ fun SyncScreen(
                     modifier = Modifier
                         .size(48.dp)
                         .scale(pulseScale),
-                    tint = Secondary
+                    tint = HeartPink
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -155,14 +160,14 @@ fun SyncScreen(
                         .clip(CircleShape)
                         .background(
                             brush = Brush.linearGradient(
-                                colors = listOf(Secondary, Secondary.copy(alpha = 0.7f))
+                                colors = listOf(Tertiary, PrimaryLight)
                             )
                         )
                         .padding(3.dp)
                 ) {
                     AsyncImage(
                         model = partnerPhotoUri,
-                        contentDescription = "Partner",
+                        contentDescription = stringResource(R.string.sync_partner),
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape),
@@ -175,7 +180,7 @@ fun SyncScreen(
 
             // Status text
             Text(
-                text = "Syncing Your Fate...",
+                text = stringResource(R.string.sync_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -184,7 +189,7 @@ fun SyncScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Analyzing facial features\nand compatibility",
+                text = stringResource(R.string.sync_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -245,13 +250,13 @@ private fun LoadingDots() {
             modifier = Modifier
                 .size(12.dp)
                 .clip(CircleShape)
-                .background(Secondary.copy(alpha = dot2Alpha))
+                .background(Tertiary.copy(alpha = dot2Alpha))
         )
         Box(
             modifier = Modifier
                 .size(12.dp)
                 .clip(CircleShape)
-                .background(Primary.copy(alpha = dot3Alpha))
+                .background(PrimaryLight.copy(alpha = dot3Alpha))
         )
     }
 }

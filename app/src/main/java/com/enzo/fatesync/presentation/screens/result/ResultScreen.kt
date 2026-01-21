@@ -43,16 +43,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.enzo.fatesync.R
 import com.enzo.fatesync.domain.model.CompatibilityResult
+import com.enzo.fatesync.ui.theme.HeartPink
 import com.enzo.fatesync.ui.theme.Primary
+import com.enzo.fatesync.ui.theme.PrimaryLight
 import com.enzo.fatesync.ui.theme.ScoreExcellent
 import com.enzo.fatesync.ui.theme.ScoreGood
-import com.enzo.fatesync.ui.theme.Secondary
+import com.enzo.fatesync.ui.theme.Tertiary
 
 @Composable
 fun ResultScreen(
@@ -95,7 +99,7 @@ fun ResultScreen(
         ) {
             AsyncImage(
                 model = yourPhotoUri,
-                contentDescription = "You",
+                contentDescription = stringResource(R.string.home_you),
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
@@ -109,18 +113,18 @@ fun ResultScreen(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                tint = Secondary
+                tint = HeartPink
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
             AsyncImage(
                 model = partnerPhotoUri,
-                contentDescription = "Partner",
+                contentDescription = stringResource(R.string.home_partner),
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .background(Secondary.copy(alpha = 0.2f)),
+                    .background(Tertiary.copy(alpha = 0.2f)),
                 contentScale = ContentScale.Crop
             )
         }
@@ -152,7 +156,7 @@ fun ResultScreen(
                     color = scoreColor
                 )
                 Text(
-                    text = "Match",
+                    text = stringResource(R.string.result_match),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -185,7 +189,7 @@ fun ResultScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Your Reading",
+                        text = stringResource(R.string.result_your_reading),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Primary,
@@ -214,7 +218,7 @@ fun ResultScreen(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Compatibility Breakdown",
+                    text = stringResource(R.string.result_breakdown),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -249,7 +253,7 @@ fun ResultScreen(
                     .fillMaxSize()
                     .background(
                         brush = Brush.horizontalGradient(
-                            colors = listOf(Primary, Secondary)
+                            colors = listOf(Primary, Tertiary, PrimaryLight)
                         ),
                         shape = RoundedCornerShape(26.dp)
                     ),
@@ -265,7 +269,7 @@ fun ResultScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Share Result",
+                        text = stringResource(R.string.result_share),
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
@@ -283,7 +287,7 @@ fun ResultScreen(
             shape = RoundedCornerShape(26.dp)
         ) {
             Text(
-                text = "Try Again",
+                text = stringResource(R.string.result_try_again),
                 fontWeight = FontWeight.Bold
             )
         }

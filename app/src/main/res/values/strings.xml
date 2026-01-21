@@ -1,3 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">FateSync</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">FateSync</string>
+    <string name="home_subtitle">Discover your compatibility</string>
+    <string name="home_you">You</string>
+    <string name="home_partner">Partner</string>
+    <string name="home_tap_to_add">Tap to add</string>
+    <string name="home_sync_button">Sync Your Fate</string>
+    <string name="home_add_photos_hint">Add both photos to continue</string>
+
+    <!-- Camera Screen -->
+    <string name="camera_title_you">Take Your Photo</string>
+    <string name="camera_title_partner">Take Partner\'s Photo</string>
+    <string name="camera_permission_title">Camera Permission Required</string>
+    <string name="camera_permission_message">Please grant camera permission to take photos for face analysis.</string>
+    <string name="camera_grant_permission">Grant Permission</string>
+    <string name="camera_go_back">Go Back</string>
+    <string name="camera_back">Back</string>
+    <string name="camera_gallery">Gallery</string>
+    <string name="camera_switch">Switch Camera</string>
+
+    <!-- Analysis Screen -->
+    <string name="analysis_title">Analyzing Faces</string>
+    <string name="analysis_subtitle">Detecting facial features…</string>
+    <string name="analysis_person1">Person 1</string>
+    <string name="analysis_person2">Person 2</string>
+    <string name="analysis_scanning">Scanning facial features…</string>
+    <string name="analysis_faces_detected">Faces Detected!</string>
+    <string name="analysis_ready">Ready to analyze compatibility</string>
+    <string name="analysis_calculate">Calculate Compatibility</string>
+    <string name="analysis_failed">Detection Failed</string>
+    <string name="analysis_try_again">Try Again</string>
+    <string name="analysis_take_new_photos">Take New Photos</string>
+
+    <!-- Sync Screen -->
+    <string name="sync_title">Syncing Your Fate…</string>
+    <string name="sync_subtitle">Analyzing facial features\nand compatibility</string>
+    <string name="sync_you">You</string>
+    <string name="sync_partner">Partner</string>
+
+    <!-- Result Screen -->
+    <string name="result_match">Match</string>
+    <string name="result_your_reading">Your Reading</string>
+    <string name="result_breakdown">Compatibility Breakdown</string>
+    <string name="result_share">Share Result</string>
+    <string name="result_try_again">Try Again</string>
+
+    <!-- Category Names -->
+    <string name="category_chemistry">Chemistry</string>
+    <string name="category_communication">Communication</string>
+    <string name="category_energy">Energy</string>
+    <string name="category_harmony">Harmony</string>
+    <string name="category_fun">Fun</string>
+
+    <!-- Messages -->
+    <string name="message_beautiful_match">A Beautiful Match!</string>
+    <string name="message_great_potential">Great Potential!</string>
+    <string name="message_interesting_connection">Interesting Connection!</string>
+
+    <!-- Settings / Language -->
+    <string name="settings_language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+
+    <!-- Errors -->
+    <string name="error_no_face_first">No face detected in first photo. Make sure face is clearly visible.</string>
+    <string name="error_no_face_second">No face detected in second photo. Make sure face is clearly visible.</string>
+    <string name="error_load_images">Failed to load images.</string>
 </resources>

@@ -125,6 +125,9 @@ dependencies {
     // Google Gemini AI
     implementation(libs.generativeai)
 
+    // DataStore Preferences
+    implementation(libs.datastore.preferences)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

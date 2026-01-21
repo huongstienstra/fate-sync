@@ -48,10 +48,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.enzo.fatesync.R
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -159,7 +161,7 @@ private fun CameraContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.camera_back),
                     tint = Color.White
                 )
             }
@@ -195,7 +197,7 @@ private fun CameraContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.PhotoLibrary,
-                    contentDescription = "Gallery",
+                    contentDescription = stringResource(R.string.camera_gallery),
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
@@ -239,7 +241,7 @@ private fun CameraContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Cameraswitch,
-                    contentDescription = "Switch Camera",
+                    contentDescription = stringResource(R.string.camera_switch),
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
@@ -261,27 +263,27 @@ private fun PermissionDeniedContent(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Camera Permission Required",
+            text = stringResource(R.string.camera_permission_title),
             style = MaterialTheme.typography.headlineSmall
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Please grant camera permission to take photos for face analysis.",
+            text = stringResource(R.string.camera_permission_message),
             style = MaterialTheme.typography.bodyLarge
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(onClick = onRequestPermission) {
-            Text("Grant Permission")
+            Text(stringResource(R.string.camera_grant_permission))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = onNavigateBack) {
-            Text("Go Back")
+            Text(stringResource(R.string.camera_go_back))
         }
     }
 }

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FateSync</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">FateSync</string>
+    <string name="home_subtitle">Khám phá độ hợp của bạn</string>
+    <string name="home_you">Bạn</string>
+    <string name="home_partner">Đối tác</string>
+    <string name="home_tap_to_add">Nhấn để thêm</string>
+    <string name="home_sync_button">Đồng Bộ Số Phận</string>
+    <string name="home_add_photos_hint">Thêm cả hai ảnh để tiếp tục</string>
+
+    <!-- Camera Screen -->
+    <string name="camera_title_you">Chụp Ảnh Của Bạn</string>
+    <string name="camera_title_partner">Chụp Ảnh Đối Tác</string>
+    <string name="camera_permission_title">Cần Quyền Camera</string>
+    <string name="camera_permission_message">Vui lòng cấp quyền camera để chụp ảnh phân tích khuôn mặt.</string>
+    <string name="camera_grant_permission">Cấp Quyền</string>
+    <string name="camera_go_back">Quay Lại</string>
+    <string name="camera_back">Quay lại</string>
+    <string name="camera_gallery">Thư viện</string>
+    <string name="camera_switch">Đổi Camera</string>
+
+    <!-- Analysis Screen -->
+    <string name="analysis_title">Đang Phân Tích Khuôn Mặt</string>
+    <string name="analysis_subtitle">Đang nhận diện đặc điểm khuôn mặt…</string>
+    <string name="analysis_person1">Người 1</string>
+    <string name="analysis_person2">Người 2</string>
+    <string name="analysis_scanning">Đang quét đặc điểm khuôn mặt…</string>
+    <string name="analysis_faces_detected">Đã Nhận Diện Khuôn Mặt!</string>
+    <string name="analysis_ready">Sẵn sàng phân tích độ hợp</string>
+    <string name="analysis_calculate">Tính Độ Hợp</string>
+    <string name="analysis_failed">Nhận Diện Thất Bại</string>
+    <string name="analysis_try_again">Thử Lại</string>
+    <string name="analysis_take_new_photos">Chụp Ảnh Mới</string>
+
+    <!-- Sync Screen -->
+    <string name="sync_title">Đang Đồng Bộ Số Phận…</string>
+    <string name="sync_subtitle">Đang phân tích đặc điểm khuôn mặt\nvà độ hợp</string>
+    <string name="sync_you">Bạn</string>
+    <string name="sync_partner">Đối tác</string>
+
+    <!-- Result Screen -->
+    <string name="result_match">Độ Hợp</string>
+    <string name="result_your_reading">Lời Giải Đoán</string>
+    <string name="result_breakdown">Phân Tích Chi Tiết</string>
+    <string name="result_share">Chia Sẻ Kết Quả</string>
+    <string name="result_try_again">Thử Lại</string>
+
+    <!-- Category Names -->
+    <string name="category_chemistry">Hóa Học</string>
+    <string name="category_communication">Giao Tiếp</string>
+    <string name="category_energy">Năng Lượng</string>
+    <string name="category_harmony">Hài Hòa</string>
+    <string name="category_fun">Vui Vẻ</string>
+
+    <!-- Messages -->
+    <string name="message_beautiful_match">Một Cặp Đôi Tuyệt Vời!</string>
+    <string name="message_great_potential">Tiềm Năng Lớn!</string>
+    <string name="message_interesting_connection">Kết Nối Thú Vị!</string>
+
+    <!-- Settings / Language -->
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="language_english">English</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+
+    <!-- Errors -->
+    <string name="error_no_face_first">Không phát hiện khuôn mặt trong ảnh đầu tiên. Hãy chắc chắn khuôn mặt rõ ràng.</string>
+    <string name="error_no_face_second">Không phát hiện khuôn mặt trong ảnh thứ hai. Hãy chắc chắn khuôn mặt rõ ràng.</string>
+    <string name="error_load_images">Không thể tải ảnh.</string>
+</resources>

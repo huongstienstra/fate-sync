@@ -22,35 +22,52 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.enzo.fatesync.R
+import com.enzo.fatesync.data.local.AppLanguage
+import com.enzo.fatesync.ui.theme.HeartPink
 import com.enzo.fatesync.ui.theme.Primary
+import com.enzo.fatesync.ui.theme.PrimaryLight
 import com.enzo.fatesync.ui.theme.Secondary
+import com.enzo.fatesync.ui.theme.Tertiary
 
 @Composable
 fun HomeScreen(
     yourPhotoUri: Uri?,
     partnerPhotoUri: Uri?,
+    currentLanguage: AppLanguage,
     onYourPhotoClick: () -> Unit,
     onPartnerPhotoClick: () -> Unit,
-    onSyncClick: () -> Unit
+    onSyncClick: () -> Unit,
+    onLanguageChange: (AppLanguage) -> Unit
 ) {
     val bothPhotosReady = yourPhotoUri != null && partnerPhotoUri != null
+    var showLanguageMenu by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -58,11 +75,46 @@ fun HomeScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        // Language selector at top right
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Box {
+                IconButton(onClick = { showLanguageMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Language,
+                        contentDescription = stringResource(R.string.settings_language),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                DropdownMenu(
+                    expanded = showLanguageMenu,
+                    onDismissRequest = { showLanguageMenu = false }
+                ) {
+                    AppLanguage.entries.forEach { language ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = language.displayName,
+                                    fontWeight = if (language == currentLanguage) FontWeight.Bold else FontWeight.Normal
+                                )
+                            },
+                            onClick = {
+                                onLanguageChange(language)
+                                showLanguageMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Title
         Text(
-            text = "FateSync",
+            text = stringResource(R.string.home_title),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -71,7 +123,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Discover your compatibility",
+            text = stringResource(R.string.home_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -87,7 +139,7 @@ fun HomeScreen(
         ) {
             // Your photo
             PhotoSlot(
-                label = "You",
+                label = stringResource(R.string.home_you),
                 photoUri = yourPhotoUri,
                 onClick = onYourPhotoClick,
                 borderColor = Primary
@@ -98,15 +150,15 @@ fun HomeScreen(
                 imageVector = Icons.Default.Favorite,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
-                tint = if (bothPhotosReady) Secondary else MaterialTheme.colorScheme.outlineVariant
+                tint = if (bothPhotosReady) HeartPink else MaterialTheme.colorScheme.outlineVariant
             )
 
             // Partner photo
             PhotoSlot(
-                label = "Partner",
+                label = stringResource(R.string.home_partner),
                 photoUri = partnerPhotoUri,
                 onClick = onPartnerPhotoClick,
-                borderColor = Secondary
+                borderColor = Tertiary
             )
         }
 
@@ -132,14 +184,14 @@ fun HomeScreen(
                         .fillMaxSize()
                         .background(
                             brush = Brush.horizontalGradient(
-                                colors = listOf(Primary, Secondary)
+                                colors = listOf(Primary, Tertiary, PrimaryLight)
                             ),
                             shape = RoundedCornerShape(28.dp)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Sync Your Fate",
+                        text = stringResource(R.string.home_sync_button),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -150,7 +202,7 @@ fun HomeScreen(
 
         if (!bothPhotosReady) {
             Text(
-                text = "Add both photos to continue",
+                text = stringResource(R.string.home_add_photos_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -202,7 +254,7 @@ private fun PhotoSlot(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Tap to add",
+                        text = stringResource(R.string.home_tap_to_add),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

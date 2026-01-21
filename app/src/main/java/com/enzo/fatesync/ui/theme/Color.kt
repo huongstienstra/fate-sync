@@ -2,28 +2,41 @@ package com.enzo.fatesync.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary - Deep Purple (mystical/fate theme)
-val Primary = Color(0xFF6B4EE6)
-val PrimaryLight = Color(0xFF9D8AFF)
-val PrimaryDark = Color(0xFF3D2DB3)
+// Primary - Cute Pink
+val Primary = Color(0xFFFF6B9D)
+val PrimaryLight = Color(0xFFFFB3C6)
+val PrimaryDark = Color(0xFFE91E63)
 
-// Secondary - Warm Rose
-val Secondary = Color(0xFFE6567A)
-val SecondaryLight = Color(0xFFFF8FA5)
-val SecondaryDark = Color(0xFFB02850)
+// Secondary - Soft Lavender
+val Secondary = Color(0xFFCDB4DB)
+val SecondaryLight = Color(0xFFE8D5F2)
+val SecondaryDark = Color(0xFF9575CD)
 
-// Tertiary - Gold accent
-val Tertiary = Color(0xFFFFB347)
-val TertiaryLight = Color(0xFFFFE47A)
-val TertiaryDark = Color(0xFFC88314)
+// Tertiary - Peachy Pink
+val Tertiary = Color(0xFFFFAFCC)
+val TertiaryLight = Color(0xFFFFD6E7)
+val TertiaryDark = Color(0xFFFF8AAE)
 
-// Background & Surface
-val BackgroundLight = Color(0xFFFFFBFE)
-val BackgroundDark = Color(0xFF1C1B1F)
-val SurfaceDark = Color(0xFF2D2B31)
+// Accent - Soft Coral
+val Accent = Color(0xFFFF9A9E)
 
-// Compatibility score colors
-val ScoreExcellent = Color(0xFF4CAF50)
-val ScoreGood = Color(0xFF8BC34A)
-val ScoreAverage = Color(0xFFFFB347)
-val ScoreLow = Color(0xFFE6567A)
+// Background & Surface - Soft pink tints
+val BackgroundLight = Color(0xFFFFF5F7)
+val BackgroundDark = Color(0xFF2D1F26)
+val SurfaceLight = Color(0xFFFFFFFF)
+val SurfaceDark = Color(0xFF3D2933)
+val SurfaceVariantLight = Color(0xFFFFF0F3)
+
+// Heart colors
+val HeartPink = Color(0xFFFF6B9D)
+val HeartRed = Color(0xFFFF4081)
+
+// Compatibility score colors - cute pastel version
+val ScoreExcellent = Color(0xFFFF6B9D)  // Pink
+val ScoreGood = Color(0xFFFFAFCC)       // Light pink
+val ScoreAverage = Color(0xFFCDB4DB)    // Lavender
+val ScoreLow = Color(0xFFB39DDB)        // Purple
+
+// Text colors
+val TextPrimary = Color(0xFF4A3540)
+val TextSecondary = Color(0xFF8B7082)
