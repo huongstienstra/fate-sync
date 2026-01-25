@@ -90,9 +90,9 @@ Return JSON only:
             - Smile probability: $smileProb
             - Left eye open: $leftEyeOpen
             - Right eye open: $rightEyeOpen
-            - Head tilt (X): ${face.headEulerAngleX?.let { "%.1f°".format(it) } ?: "unknown"}
-            - Head turn (Y): ${face.headEulerAngleY?.let { "%.1f°".format(it) } ?: "unknown"}
-            - Head rotation (Z): ${face.headEulerAngleZ?.let { "%.1f°".format(it) } ?: "unknown"}
+            - Head tilt (X): ${"%.1f°".format(face.headEulerAngleX)}
+            - Head turn (Y): ${"%.1f°".format(face.headEulerAngleY)}
+            - Head rotation (Z): ${"%.1f°".format(face.headEulerAngleZ)}
             - Face bounds: ${face.boundingBox.let { "${it.right - it.left}x${it.bottom - it.top}" }}
             - Landmarks detected: ${face.landmarks.size}
         """.trimIndent()

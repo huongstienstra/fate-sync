@@ -170,6 +170,8 @@ private fun FaceDetectedContent(
     onContinue: () -> Unit
 ) {
     var animate by remember { mutableStateOf(false) }
+    // Animation progress for future use
+    @Suppress("UNUSED_VARIABLE")
     val progress by animateFloatAsState(
         targetValue = if (animate) 1f else 0f,
         animationSpec = tween(durationMillis = 1000),

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,12 +33,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.enzo.fatesync.R
@@ -47,7 +54,6 @@ import com.enzo.fatesync.presentation.screens.analysis.AnalysisViewModel
 import com.enzo.fatesync.ui.theme.HeartPink
 import com.enzo.fatesync.ui.theme.Primary
 import com.enzo.fatesync.ui.theme.PrimaryLight
-import com.enzo.fatesync.ui.theme.Secondary
 import com.enzo.fatesync.ui.theme.Tertiary
 
 @Composable
@@ -72,14 +78,24 @@ fun SyncScreen(
         label = "pulseScale"
     )
 
-    val gradientOffset by infiniteTransition.animateFloat(
+    val heart1Offset by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 1f,
+        targetValue = -20f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "heart1Offset"
+    )
+
+    val heart2Offset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 15f,
         animationSpec = infiniteRepeatable(
             animation = tween(2000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "gradientOffset"
+        label = "heart2Offset"
     )
 
     LaunchedEffect(Unit) {
@@ -97,17 +113,51 @@ fun SyncScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        PrimaryLight.copy(alpha = 0.2f + gradientOffset * 0.2f),
-                        Tertiary.copy(alpha = 0.2f + (1 - gradientOffset) * 0.2f),
-                        PrimaryLight.copy(alpha = 0.2f + gradientOffset * 0.2f)
-                    )
-                )
-            ),
+            .background(Primary),
         contentAlignment = Alignment.Center
     ) {
+        // Large heart shape background
+        Icon(
+            imageVector = Icons.Default.Favorite,
+            contentDescription = null,
+            modifier = Modifier
+                .size(400.dp)
+                .align(Alignment.Center)
+                .offset(y = (-80).dp),
+            tint = PrimaryLight.copy(alpha = 0.3f)
+        )
+
+        // Floating hearts decoration
+        Icon(
+            imageVector = Icons.Default.Favorite,
+            contentDescription = null,
+            modifier = Modifier
+                .size(60.dp)
+                .offset(x = (-120).dp, y = (heart1Offset - 180).dp)
+                .scale(pulseScale * 0.8f),
+            tint = Color.White.copy(alpha = 0.2f)
+        )
+
+        Icon(
+            imageVector = Icons.Default.Favorite,
+            contentDescription = null,
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.TopEnd)
+                .offset(x = (-40).dp, y = (heart2Offset + 120).dp),
+            tint = Color.White.copy(alpha = 0.15f)
+        )
+
+        Icon(
+            imageVector = Icons.Default.Favorite,
+            contentDescription = null,
+            modifier = Modifier
+                .size(50.dp)
+                .offset(x = 130.dp, y = (heart2Offset + 200).dp)
+                .scale(pulseScale * 0.7f),
+            tint = Color.White.copy(alpha = 0.2f)
+        )
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -120,14 +170,16 @@ fun SyncScreen(
                 // Your photo
                 Box(
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Primary, Tertiary)
-                            )
+                        .size(110.dp)
+                        .shadow(
+                            elevation = 16.dp,
+                            shape = CircleShape,
+                            spotColor = Color.Black.copy(alpha = 0.2f)
                         )
-                        .padding(3.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .padding(4.dp)
+                        .clip(CircleShape)
                 ) {
                     AsyncImage(
                         model = yourPhotoUri,
@@ -139,31 +191,33 @@ fun SyncScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(20.dp))
 
                 // Pulsing heart
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(56.dp)
                         .scale(pulseScale),
-                    tint = HeartPink
+                    tint = Color.White
                 )
 
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(20.dp))
 
                 // Partner photo
                 Box(
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Tertiary, PrimaryLight)
-                            )
+                        .size(110.dp)
+                        .shadow(
+                            elevation = 16.dp,
+                            shape = CircleShape,
+                            spotColor = Color.Black.copy(alpha = 0.2f)
                         )
-                        .padding(3.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .padding(4.dp)
+                        .clip(CircleShape)
                 ) {
                     AsyncImage(
                         model = partnerPhotoUri,
@@ -176,28 +230,31 @@ fun SyncScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(56.dp))
 
             // Status text
             Text(
-                text = stringResource(R.string.sync_title),
-                style = MaterialTheme.typography.headlineMedium,
+                text = "Finding your connection...",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontSize = 24.sp
+                ),
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
+                color = Color.White,
+                textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = stringResource(R.string.sync_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = Color.White.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            // Animated dots
+            // Animated loading dots
             LoadingDots()
         }
     }
@@ -207,56 +264,60 @@ fun SyncScreen(
 private fun LoadingDots() {
     val infiniteTransition = rememberInfiniteTransition(label = "dots")
 
-    val dot1Alpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
+    val dot1Scale by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
-            animation = tween(500),
+            animation = tween(400),
             repeatMode = RepeatMode.Reverse
         ),
         label = "dot1"
     )
 
-    val dot2Alpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
+    val dot2Scale by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
-            animation = tween(500, delayMillis = 150),
+            animation = tween(400, delayMillis = 150),
             repeatMode = RepeatMode.Reverse
         ),
         label = "dot2"
     )
 
-    val dot3Alpha by infiniteTransition.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 1f,
+    val dot3Scale by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
-            animation = tween(500, delayMillis = 300),
+            animation = tween(400, delayMillis = 300),
             repeatMode = RepeatMode.Reverse
         ),
         label = "dot3"
     )
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
                 .size(12.dp)
+                .scale(dot1Scale)
                 .clip(CircleShape)
-                .background(Primary.copy(alpha = dot1Alpha))
+                .background(Color.White)
         )
         Box(
             modifier = Modifier
                 .size(12.dp)
+                .scale(dot2Scale)
                 .clip(CircleShape)
-                .background(Tertiary.copy(alpha = dot2Alpha))
+                .background(Color.White)
         )
         Box(
             modifier = Modifier
                 .size(12.dp)
+                .scale(dot3Scale)
                 .clip(CircleShape)
-                .background(PrimaryLight.copy(alpha = dot3Alpha))
+                .background(Color.White)
         )
     }
 }

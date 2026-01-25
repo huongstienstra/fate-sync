@@ -1,6 +1,8 @@
 package com.enzo.fatesync.data.local
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -36,16 +38,27 @@ class LanguageManager @Inject constructor(
     private val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     val currentLanguage: Flow<AppLanguage> = context.dataStore.data.map { preferences ->
+        // First check AppCompat's current locale (most accurate during runtime)
+        val appCompatLocale = AppCompatDelegate.getApplicationLocales()
+        if (!appCompatLocale.isEmpty) {
+            val code = appCompatLocale.get(0)?.language ?: "en"
+            return@map AppLanguage.fromCode(code)
+        }
+        // Fallback to stored preference
         val code = preferences[languageKey] ?: sharedPrefs.getString(KEY_LANGUAGE, null) ?: Locale.getDefault().language
         AppLanguage.fromCode(code)
     }
 
     suspend fun setLanguage(language: AppLanguage) {
-        // Save to both DataStore and SharedPreferences for reliability
+        // Save to both DataStore and SharedPreferences for persistence across app restarts
         context.dataStore.edit { preferences ->
             preferences[languageKey] = language.code
         }
         sharedPrefs.edit().putString(KEY_LANGUAGE, language.code).apply()
+
+        // Update AppCompat's locale for smooth runtime switching
+        val localeList = LocaleListCompat.forLanguageTags(language.code)
+        AppCompatDelegate.setApplicationLocales(localeList)
     }
 
     fun getLocale(language: AppLanguage): Locale {

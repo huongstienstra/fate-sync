@@ -2,11 +2,12 @@ package com.enzo.fatesync.presentation.screens.home
 
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,22 +16,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,20 +38,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import androidx.compose.ui.unit.sp
 import com.enzo.fatesync.R
 import com.enzo.fatesync.data.local.AppLanguage
+import com.enzo.fatesync.presentation.components.GradientButton
+import com.enzo.fatesync.presentation.components.StyledPhotoFrame
 import com.enzo.fatesync.ui.theme.HeartPink
 import com.enzo.fatesync.ui.theme.Primary
 import com.enzo.fatesync.ui.theme.PrimaryLight
-import com.enzo.fatesync.ui.theme.Secondary
 import com.enzo.fatesync.ui.theme.Tertiary
 
 @Composable
@@ -69,206 +70,191 @@ fun HomeScreen(
     val bothPhotosReady = yourPhotoUri != null && partnerPhotoUri != null
     var showLanguageMenu by remember { mutableStateOf(false) }
 
-    Column(
+    val heartScale by animateFloatAsState(
+        targetValue = if (bothPhotosReady) 1.2f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "heartScale"
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color.White)
     ) {
-        // Language selector at top right
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+        // Large decorative pink circle - top left
+        Box(
+            modifier = Modifier
+                .size(320.dp)
+                .offset(x = (-120).dp, y = (-80).dp)
+                .clip(CircleShape)
+                .background(PrimaryLight.copy(alpha = 0.5f))
+        )
+
+        // Smaller accent circle - bottom right
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .align(Alignment.BottomEnd)
+                .offset(x = 80.dp, y = 80.dp)
+                .clip(CircleShape)
+                .background(PrimaryLight.copy(alpha = 0.3f))
+        )
+
+        // Main content
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box {
-                IconButton(onClick = { showLanguageMenu = true }) {
-                    Icon(
-                        imageVector = Icons.Default.Language,
-                        contentDescription = stringResource(R.string.settings_language),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-                DropdownMenu(
-                    expanded = showLanguageMenu,
-                    onDismissRequest = { showLanguageMenu = false }
-                ) {
-                    AppLanguage.entries.forEach { language ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = language.displayName,
-                                    fontWeight = if (language == currentLanguage) FontWeight.Bold else FontWeight.Normal
-                                )
-                            },
-                            onClick = {
-                                onLanguageChange(language)
-                                showLanguageMenu = false
-                            }
-                        )
+            // Language selector
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box {
+                    Surface(
+                        onClick = { showLanguageMenu = true },
+                        shape = CircleShape,
+                        color = Primary.copy(alpha = 0.1f)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Language,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                                tint = Primary
+                            )
+                            Text(
+                                text = " ${currentLanguage.code.uppercase()}",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Primary
+                            )
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = Primary
+                            )
+                        }
+                    }
+                    DropdownMenu(
+                        expanded = showLanguageMenu,
+                        onDismissRequest = { showLanguageMenu = false }
+                    ) {
+                        AppLanguage.entries.forEach { language ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = language.displayName,
+                                        fontWeight = if (language == currentLanguage) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                onClick = {
+                                    onLanguageChange(language)
+                                    showLanguageMenu = false
+                                }
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-        // Title
-        Text(
-            text = stringResource(R.string.home_title),
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = stringResource(R.string.home_subtitle),
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(64.dp))
-
-        // Photo slots
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Your photo
-            PhotoSlot(
-                label = stringResource(R.string.home_you),
-                photoUri = yourPhotoUri,
-                onClick = onYourPhotoClick,
-                borderColor = Primary
-            )
-
-            // Heart icon in middle
-            Icon(
-                imageVector = Icons.Default.Favorite,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = if (bothPhotosReady) HeartPink else MaterialTheme.colorScheme.outlineVariant
-            )
-
-            // Partner photo
-            PhotoSlot(
-                label = stringResource(R.string.home_partner),
-                photoUri = partnerPhotoUri,
-                onClick = onPartnerPhotoClick,
-                borderColor = Tertiary
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Sync button
-        AnimatedVisibility(
-            visible = bothPhotosReady,
-            enter = fadeIn() + scaleIn()
-        ) {
-            Button(
-                onClick = onSyncClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(Primary, Tertiary, PrimaryLight)
-                            ),
-                            shape = RoundedCornerShape(28.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.home_sync_button),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-        }
-
-        if (!bothPhotosReady) {
+            // Title with accent color
             Text(
-                text = stringResource(R.string.home_add_photos_hint),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = buildAnnotatedString {
+                    append("Find ")
+                    withStyle(style = SpanStyle(color = Primary)) {
+                        append("Love")
+                    }
+                    append(",\nConnect Hearts!")
+                },
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontSize = 28.sp,
+                    lineHeight = 36.sp
+                ),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                color = Color(0xFF333333)
             )
-        }
 
-        Spacer(modifier = Modifier.height(32.dp))
-    }
-}
+            Spacer(modifier = Modifier.height(12.dp))
 
-@Composable
-private fun PhotoSlot(
-    label: String,
-    photoUri: Uri?,
-    onClick: () -> Unit,
-    borderColor: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(130.dp)
-                .clip(CircleShape)
-                .border(
-                    width = 3.dp,
-                    color = if (photoUri != null) borderColor else MaterialTheme.colorScheme.outlineVariant,
-                    shape = CircleShape
+            Text(
+                text = stringResource(R.string.home_subtitle),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = Color(0xFF666666)
+            )
+
+            Spacer(modifier = Modifier.height(60.dp))
+
+            // Photo slots with heart
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                StyledPhotoFrame(
+                    photoUri = yourPhotoUri,
+                    label = stringResource(R.string.home_you),
+                    onClick = onYourPhotoClick,
+                    borderGradient = listOf(Primary, Tertiary)
                 )
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .clickable(onClick = onClick),
-            contentAlignment = Alignment.Center
-        ) {
-            if (photoUri != null) {
-                AsyncImage(
-                    model = photoUri,
-                    contentDescription = label,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+
+                // Animated heart - always pink, just lighter when inactive
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .scale(heartScale),
+                    tint = if (bothPhotosReady) HeartPink else PrimaryLight
                 )
-            } else {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(R.string.home_tap_to_add),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+
+                StyledPhotoFrame(
+                    photoUri = partnerPhotoUri,
+                    label = stringResource(R.string.home_partner),
+                    onClick = onPartnerPhotoClick,
+                    borderGradient = listOf(Tertiary, PrimaryLight)
+                )
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Sync button
+            AnimatedVisibility(
+                visible = bothPhotosReady,
+                enter = fadeIn() + scaleIn()
+            ) {
+                GradientButton(
+                    text = stringResource(R.string.home_sync_button),
+                    onClick = onSyncClick,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+            }
+
+            if (!bothPhotosReady) {
+                Text(
+                    text = stringResource(R.string.home_add_photos_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = Primary.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = label,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium,
-            color = if (photoUri != null) borderColor else MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

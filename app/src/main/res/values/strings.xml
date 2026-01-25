@@ -4,6 +4,7 @@
 
     <!-- Home Screen -->
     <string name="home_title">FateSync</string>
+    <string name="home_headline">Find Love,\nConnect Hearts!</string>
     <string name="home_subtitle">Discover your compatibility</string>
     <string name="home_you">You</string>
     <string name="home_partner">Partner</string>
@@ -21,6 +22,9 @@
     <string name="camera_back">Back</string>
     <string name="camera_gallery">Gallery</string>
     <string name="camera_switch">Switch Camera</string>
+    <string name="camera_capture">Capture</string>
+    <string name="camera_retake">Retake</string>
+    <string name="camera_use_photo">Use Photo</string>
 
     <!-- Analysis Screen -->
     <string name="analysis_title">Analyzing Faces</string>
@@ -37,16 +41,19 @@
 
     <!-- Sync Screen -->
     <string name="sync_title">Syncing Your Fate…</string>
-    <string name="sync_subtitle">Analyzing facial features\nand compatibility</string>
+    <string name="sync_headline">Finding your connection…</string>
+    <string name="sync_subtitle">Analyzing facial features and compatibility</string>
     <string name="sync_you">You</string>
     <string name="sync_partner">Partner</string>
 
     <!-- Result Screen -->
+    <string name="result_title">It\'s a Match!</string>
     <string name="result_match">Match</string>
     <string name="result_your_reading">Your Reading</string>
     <string name="result_breakdown">Compatibility Breakdown</string>
     <string name="result_share">Share Result</string>
     <string name="result_try_again">Try Again</string>
+    <string name="result_congrats">Congratulations!</string>
 
     <!-- Category Names -->
     <string name="category_chemistry">Chemistry</string>
@@ -59,6 +66,8 @@
     <string name="message_beautiful_match">A Beautiful Match!</string>
     <string name="message_great_potential">Great Potential!</string>
     <string name="message_interesting_connection">Interesting Connection!</string>
+    <string name="message_perfect_pair">Perfect Pair!</string>
+    <string name="message_soulmates">Soulmates!</string>
 
     <!-- Settings / Language -->
     <string name="settings_language">Language</string>
@@ -69,4 +78,33 @@
     <string name="error_no_face_first">No face detected in first photo. Make sure face is clearly visible.</string>
     <string name="error_no_face_second">No face detected in second photo. Make sure face is clearly visible.</string>
     <string name="error_load_images">Failed to load images.</string>
+    <string name="error_analysis_failed">Analysis failed. Please try again.</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+
+    <!-- Disclaimer / Consent -->
+    <string name="disclaimer_title">For Entertainment Only</string>
+    <string name="disclaimer_message">This app uses AI to generate fun compatibility scores based on facial features. Results are for entertainment purposes only and are not scientifically validated.</string>
+    <string name="disclaimer_accept">I Understand</string>
+    <string name="disclaimer_privacy">Privacy Policy</string>
+
+    <!-- About -->
+    <string name="about_title">About FateSync</string>
+    <string name="about_description">FateSync uses advanced AI technology to analyze facial features and generate fun compatibility scores. Perfect for friends, couples, or just for fun!</string>
+    <string name="about_version">Version</string>
+    <string name="about_developer">Developed with love</string>
+
+    <!-- Share -->
+    <string name="share_title">Share via</string>
+    <string name="share_message">Our compatibility score is %1$d%%! Check yours with FateSync app.</string>
+
+    <!-- Notifications -->
+    <string name="notification_analysis_complete">Analysis Complete!</string>
+    <string name="notification_tap_to_view">Tap to view your compatibility result</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_your_photo">Your photo</string>
+    <string name="accessibility_partner_photo">Partner\'s photo</string>
+    <string name="accessibility_heart_icon">Heart icon</string>
+    <string name="accessibility_score">Compatibility score</string>
+    <string name="accessibility_switch_language">Switch language</string>
 </resources>

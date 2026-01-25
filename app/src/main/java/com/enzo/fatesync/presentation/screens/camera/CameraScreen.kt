@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
@@ -68,7 +68,6 @@ fun CameraScreen(
     onPhotoCaptured: (Uri) -> Unit
 ) {
     var hasCameraPermission by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -160,7 +159,7 @@ private fun CameraContent(
                     .background(Color.Black.copy(alpha = 0.5f), CircleShape)
             ) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.camera_back),
                     tint = Color.White
                 )
@@ -293,7 +292,7 @@ private fun takePhoto(
     imageCapture: ImageCapture?,
     onPhotoCaptured: (Uri) -> Unit
 ) {
-    val imageCapture = imageCapture ?: return
+    val capture = imageCapture ?: return
 
     val photoFile = File(
         context.cacheDir,
@@ -304,7 +303,7 @@ private fun takePhoto(
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
     val executor: Executor = ContextCompat.getMainExecutor(context)
 
-    imageCapture.takePicture(
+    capture.takePicture(
         outputOptions,
         executor,
         object : ImageCapture.OnImageSavedCallback {
