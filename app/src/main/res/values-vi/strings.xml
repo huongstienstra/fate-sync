@@ -75,6 +75,8 @@
     <string name="language_vietnamese">Tiếng Việt</string>
 
     <!-- Errors -->
+    <string name="error_dialog_title">Rất tiếc!</string>
+    <string name="error_dialog_ok">OK</string>
     <string name="error_no_face_first">Không phát hiện khuôn mặt trong ảnh đầu tiên. Hãy đảm bảo khuôn mặt hiển thị rõ ràng.</string>
     <string name="error_no_face_second">Không phát hiện khuôn mặt trong ảnh thứ hai. Hãy đảm bảo khuôn mặt hiển thị rõ ràng.</string>
     <string name="error_load_images">Không thể tải ảnh.</string>

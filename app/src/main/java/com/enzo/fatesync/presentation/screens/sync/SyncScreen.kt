@@ -49,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.enzo.fatesync.R
 import com.enzo.fatesync.domain.model.CompatibilityResult
+import com.enzo.fatesync.presentation.screens.analysis.AnalysisError
 import com.enzo.fatesync.presentation.screens.analysis.AnalysisState
 import com.enzo.fatesync.presentation.screens.analysis.AnalysisViewModel
 import com.enzo.fatesync.ui.theme.HeartPink
@@ -65,6 +66,7 @@ fun SyncScreen(
     viewModel: AnalysisViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
 
@@ -105,7 +107,16 @@ fun SyncScreen(
     LaunchedEffect(state) {
         when (val currentState = state) {
             is AnalysisState.FacesDetected -> onSyncComplete(currentState.compatibilityResult)
-            is AnalysisState.Error -> onError(currentState.message)
+            is AnalysisState.Error -> {
+                val errorMessage = when (currentState.error) {
+                    AnalysisError.NO_FACE_FIRST -> context.getString(R.string.error_no_face_first)
+                    AnalysisError.NO_FACE_SECOND -> context.getString(R.string.error_no_face_second)
+                    AnalysisError.LOAD_IMAGES_FAILED -> context.getString(R.string.error_load_images)
+                    AnalysisError.ANALYSIS_FAILED -> context.getString(R.string.error_analysis_failed)
+                    AnalysisError.GENERIC_ERROR -> context.getString(R.string.error_generic)
+                }
+                onError(errorMessage)
+            }
             else -> {}
         }
     }

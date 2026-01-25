@@ -31,10 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.enzo.fatesync.R
 
 @Composable
 fun AnalysisScreen(
@@ -107,8 +109,16 @@ fun AnalysisScreen(
                 )
             }
             is AnalysisState.Error -> {
+                val context = LocalContext.current
+                val errorMessage = when (currentState.error) {
+                    AnalysisError.NO_FACE_FIRST -> context.getString(R.string.error_no_face_first)
+                    AnalysisError.NO_FACE_SECOND -> context.getString(R.string.error_no_face_second)
+                    AnalysisError.LOAD_IMAGES_FAILED -> context.getString(R.string.error_load_images)
+                    AnalysisError.ANALYSIS_FAILED -> context.getString(R.string.error_analysis_failed)
+                    AnalysisError.GENERIC_ERROR -> context.getString(R.string.error_generic)
+                }
                 ErrorContent(
-                    message = currentState.message,
+                    message = errorMessage,
                     onRetry = { viewModel.analyzePhotos(photo1Uri, photo2Uri) },
                     onGoBack = onNavigateBack
                 )

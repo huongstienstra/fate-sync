@@ -75,6 +75,8 @@
     <string name="language_vietnamese">Tiếng Việt</string>
 
     <!-- Errors -->
+    <string name="error_dialog_title">Oops!</string>
+    <string name="error_dialog_ok">OK</string>
     <string name="error_no_face_first">No face detected in first photo. Make sure face is clearly visible.</string>
     <string name="error_no_face_second">No face detected in second photo. Make sure face is clearly visible.</string>
     <string name="error_load_images">Failed to load images.</string>

@@ -1,10 +1,15 @@
 package com.enzo.fatesync.presentation.navigation
 
 import android.net.Uri
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +42,21 @@ fun NavGraph(
     var yourPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var partnerPhotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var compatibilityResult by remember { mutableStateOf<CompatibilityResult?>(null) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // Error dialog
+    errorMessage?.let { message ->
+        AlertDialog(
+            onDismissRequest = { errorMessage = null },
+            title = { Text(stringResource(R.string.error_dialog_title)) },
+            text = { Text(message) },
+            confirmButton = {
+                TextButton(onClick = { errorMessage = null }) {
+                    Text(stringResource(R.string.error_dialog_ok))
+                }
+            }
+        )
+    }
 
     NavHost(
         navController = navController,
@@ -109,7 +129,8 @@ fun NavGraph(
                         popUpTo(Screen.Home.route)
                     }
                 },
-                onError = {
+                onError = { message ->
+                    errorMessage = message
                     navController.popBackStack(Screen.Home.route, inclusive = false)
                 }
             )

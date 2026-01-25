@@ -26,6 +26,14 @@ import javax.inject.Inject
 
 private const val TAG = "AnalysisViewModel"
 
+enum class AnalysisError {
+    NO_FACE_FIRST,
+    NO_FACE_SECOND,
+    LOAD_IMAGES_FAILED,
+    ANALYSIS_FAILED,
+    GENERIC_ERROR
+}
+
 sealed class AnalysisState {
     data object Loading : AnalysisState()
     data class FacesDetected(
@@ -33,7 +41,7 @@ sealed class AnalysisState {
         val face2: FaceData,
         val compatibilityResult: CompatibilityResult
     ) : AnalysisState()
-    data class Error(val message: String) : AnalysisState()
+    data class Error(val error: AnalysisError) : AnalysisState()
 }
 
 @HiltViewModel
@@ -71,7 +79,7 @@ class AnalysisViewModel @Inject constructor(
                 Log.d(TAG, "Bitmap2 loaded: ${bitmap2 != null}, size: ${bitmap2?.width}x${bitmap2?.height}")
 
                 if (bitmap1 == null || bitmap2 == null) {
-                    _state.value = AnalysisState.Error("Failed to load images. Bitmap1: ${bitmap1 != null}, Bitmap2: ${bitmap2 != null}")
+                    _state.value = AnalysisState.Error(AnalysisError.LOAD_IMAGES_FAILED)
                     return@launch
                 }
 
@@ -84,10 +92,10 @@ class AnalysisViewModel @Inject constructor(
 
                 when {
                     faces1.isEmpty() -> {
-                        _state.value = AnalysisState.Error("No face detected in first photo. Make sure face is clearly visible.")
+                        _state.value = AnalysisState.Error(AnalysisError.NO_FACE_FIRST)
                     }
                     faces2.isEmpty() -> {
-                        _state.value = AnalysisState.Error("No face detected in second photo. Make sure face is clearly visible.")
+                        _state.value = AnalysisState.Error(AnalysisError.NO_FACE_SECOND)
                     }
                     else -> {
                         val face1 = faces1.first()
@@ -108,7 +116,7 @@ class AnalysisViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error during analysis", e)
-                _state.value = AnalysisState.Error("Error: ${e.message}")
+                _state.value = AnalysisState.Error(AnalysisError.GENERIC_ERROR)
             }
         }
     }
