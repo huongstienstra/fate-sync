@@ -2,4 +2,12 @@
 <resources>
 
     <style name="Theme.FateSync" parent="Theme.AppCompat.Light.NoActionBar" />
+
+    <!-- Splash Screen Theme -->
+    <style name="Theme.FateSync.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.FateSync</item>
+    </style>
 </resources>
