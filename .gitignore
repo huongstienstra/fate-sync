@@ -36,6 +36,7 @@ local.properties
 # Keystore files
 *.jks
 *.keystore
+keystore.properties
 
 # Google Services (optional - uncomment if needed)
 # google-services.json
